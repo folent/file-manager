@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { EOL } from 'os'
 
-const errorMessage = 'FS operation failed';
+const errorMessage = 'Operation failed';
 const { stdout } = process;
 const hash = createHash('sha256');
 

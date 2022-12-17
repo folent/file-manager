@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { EOL, getInfoByParametr, homedir } from './modules/os.js';
 import { add, rm } from './modules/fs.js';
-import { up } from './modules/nwd.js'
+import { ls, up } from './modules/nwd.js'
 import { getHash } from './modules/hash.js';
 import { compress, decompress } from './modules/zip.js';
 
@@ -34,6 +34,9 @@ const parseArgs = () => {
                 case 'up':
                     const currentPath = up(currentDir);
                     console.log(currentPath);
+                    break;
+                case 'ls':
+                    ls(currentDir)
                     break;
                 case 'os':
                     getInfoByParametr(param1)

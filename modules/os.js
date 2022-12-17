@@ -1,7 +1,7 @@
 import { homedir, EOL, cpus, hostname, endianness } from 'node:os'
 
 const { stdout } = process;
-const errorMessage = 'FS operation failed';
+const errorMessage = 'Operation failed';
 
 const getInfoByParametr = async (param) => {
     try {

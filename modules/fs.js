@@ -1,6 +1,6 @@
 import { unlink, writeFile } from 'node:fs/promises';
 
-const errorMessage = 'FS operation failed';
+const errorMessage = 'Operation failed';
 const { stdout } = process;
 
 export const add = async (filePath) => {

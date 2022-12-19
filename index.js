@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { EOL, getInfoByParametr, homedir } from './modules/os.js';
-import { add, rm } from './modules/fs.js';
-import { ls, up } from './modules/nwd.js'
+import {add, cat, copyFile, renameFile, rm} from './modules/fs.js';
+import {cd, ls, up} from './modules/nwd.js'
 import { getHash } from './modules/hash.js';
 import { compress, decompress } from './modules/zip.js';
 
@@ -12,12 +12,15 @@ const parseArgs = () => {
 
     const userNameArg = args.find(el => el.includes('--username'));
     const [_, userName] = userNameArg.split('=');
+    if(!userNameArg || !userName) {
+        throw new Error('Invalid input')
+    }
     stdout.write(`Welcome to the File Manager, ${userName}!${EOL}`)
- 
 
-    const echoInput = (chunk) => {
+
+    const echoInput = async (chunk) => {
         const chunkStringified = chunk.toString();
-        const [command, param1, param2] = chunkStringified.split(' ');
+        const [command, param1, param2] = chunkStringified.trim().split(' ');
 
         try {
             switch(command.trim()) {
@@ -25,34 +28,59 @@ const parseArgs = () => {
                     process.emit('SIGINT');
                     break;
                 case 'add':
-                    add(currentDir + '/' + param1.trim());
+                    await add(path.resolve(currentDir, param1));
                     break;
                 case 'rm':
-                    const filePath = path.resolve(currentDir, param1);
-                    rm(filePath);
+                    await rm(path.resolve(currentDir, param1));
+                    break;
+                case 'cat':
+                    await cat(path.resolve(currentDir, param1))
+                    break;
+                case 'rn':
+                    await renameFile(
+                        path.resolve(currentDir, param1),
+                        param2
+                    )
+                    break;
+                case 'cp':
+                    await copyFile(
+                        path.resolve(currentDir, param1),
+                        path.resolve(currentDir, param2)
+                    )
+                    break;
+                case 'mv':
+                    await copyFile(
+                        path.resolve(currentDir, param1),
+                        path.resolve(currentDir, param2)
+                    )
+                    await rm(path.resolve(currentDir, param1))
                     break;
                 case 'up':
-                    const currentPath = up(currentDir);
-                    console.log(currentPath);
+                    currentDir = up(currentDir);
+                    break;
+                case 'cd':
+                    currentDir = await cd(currentDir, param1)
                     break;
                 case 'ls':
-                    ls(currentDir)
+                    await ls(currentDir)
                     break;
                 case 'os':
-                    getInfoByParametr(param1)
+                    await getInfoByParametr(param1)
                     break;
                 case 'hash':
-                    getHash(currentDir + '/' + param1.trim());
+                    await getHash(path.resolve(currentDir, param1));
                     break;
                 case 'compress':
-                    const path1 = path.resolve(currentDir, param1.trim());
-                    const path2 = path.resolve(currentDir, param2.trim());
-                    compress(path1, path2);
+                    await compress(
+                        path.resolve(currentDir, param1),
+                        path.resolve(currentDir, param2)
+                    );
                     break;
                 case 'decompress':
-                    const path3 = path.resolve(currentDir, param1.trim());
-                    const path4 = path.resolve(currentDir, param2.trim());
-                    decompress(path4, path3);
+                    await decompress(
+                        path.resolve(currentDir, param1),
+                        path.resolve(currentDir, param2)
+                    );
                     break;
                 default:
                     throw new Error('Invalid input')
@@ -68,7 +96,7 @@ const parseArgs = () => {
         stdout.write(`Thank you for using File Manager, ${userName}, goodbye!${EOL}`)
         exit(0)
     })
- 
+
 };
 
 parseArgs();

@@ -1,7 +1,7 @@
 import { homedir, EOL, cpus, hostname, endianness } from 'node:os'
+import {loggingOperationError} from "../helpers/loggingOperationError.js";
 
 const { stdout } = process;
-const errorMessage = 'Operation failed';
 
 const getInfoByParametr = async (param) => {
     try {
@@ -22,11 +22,11 @@ const getInfoByParametr = async (param) => {
                 stdout.write(endianness() + EOL)
                 break;
             default:
-                throw new Error(errorMessage)
+                throw new Error()
         }
-    
+
       } catch (err) {
-        stdout.write(`${errorMessage}\n`)
+        loggingOperationError()
     }
 }
 

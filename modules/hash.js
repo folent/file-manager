@@ -1,10 +1,8 @@
-import { createHash } from 'node:crypto'
-import { createReadStream } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
-import { EOL } from 'os'
+import { EOL } from 'os';
+import {loggingOperationError} from "../helpers/loggingOperationError.js";
 
-const errorMessage = 'Operation failed';
 const { stdout } = process;
 const hash = createHash('sha256');
 
@@ -13,11 +11,11 @@ export const getHash = async (path) => {
         const data = await readFile(path, { encoding: 'utf8' });
         if (data) {
             hash.update(data);
-            stdout.write(`hex is ${hash.digest('hex')}` + EOL);
+            stdout.write(`hex is ${await hash.digest('hex')}` + EOL);
         } else {
-            stdout.write(`${errorMessage}\n`)
+            loggingOperationError()
         }
     } catch (e) {
-        stdout.write(`${errorMessage}\n`)
+        loggingOperationError()
     }
 }

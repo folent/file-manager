@@ -1,15 +1,27 @@
-import { fileURLToPath } from 'url';
-import { dirname, basename, resolve } from 'path';
-import { readdir } from 'fs/promises';
+import path from 'path';
+import { access, readdir } from 'node:fs/promises';
+import fs from 'node:fs';
+import {loggingOperationError} from "../helpers/loggingOperationError.js";
 
-const errorMessage = 'Operation failed';
+const ROOT_PATH = 'C:\\'
 
-const { stdout } = process;
+const up = (currentPath) => {
+    if (currentPath === ROOT_PATH) {
+        return currentPath
+    }
+    return path.dirname(currentPath)
+}
 
-const up = async (path) => {
-    // const __filename = fileURLToPath(path);
-    const __dirname = dirname(path);
-    return basename(dirname(path));
+const cd = async (currentDir, nextFolder) => {
+    const currentPath = path.resolve(currentDir, nextFolder);
+
+    try {
+        await access(currentPath, fs.constants.F_OK)
+
+        return currentPath;
+    } catch (e) {
+        return currentDir;
+    }
 }
 
 const ls = async (path) => {
@@ -28,11 +40,12 @@ const ls = async (path) => {
                 .sort((a, b) => a.Type.localeCompare(b.Type)),
             ['Name', 'Type'])
     } catch (e) {
-        stdout.write(`${errorMessage}\n`)
+        loggingOperationError()
     }
 }
 
 export {
     up,
+    cd,
     ls
 }
